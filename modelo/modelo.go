@@ -16,7 +16,7 @@ type Participante struct {
 	Identificador int
 	Nombre        string
 	AmigoID       uint
-	Amigo         *Participante
+	Amigo         *Participante `gorm:"<-:update"`
 }
 
 func NewGrupo(identificador int64, nombre string) *Grupo {

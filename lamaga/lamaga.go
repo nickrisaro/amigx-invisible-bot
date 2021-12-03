@@ -68,11 +68,6 @@ func (lm *LaMaga) Sortear(identificadorDeGrupo int64) ([]*modelo.Participante, e
 		return grupoDeLaDB.Participantes, nil
 	}
 
-	resultado = lm.miBaseDeDatos.Save(grupoDeLaDB.Participantes)
-	if resultado.Error != nil {
-		return nil, resultado.Error
-	}
-
 	cantidadDeParticipantes := len(grupoDeLaDB.Participantes)
 
 	idsSorteados := make(map[int]bool, cantidadDeParticipantes)
@@ -93,6 +88,11 @@ func (lm *LaMaga) Sortear(identificadorDeGrupo int64) ([]*modelo.Participante, e
 		idAmigx := sorteados[i]
 		amigx := grupoDeLaDB.Participantes[idAmigx]
 		participante.Amigo = amigx
+
+		resultado = lm.miBaseDeDatos.Save(participante)
+		if resultado.Error != nil {
+			return nil, resultado.Error
+		}
 	}
 
 	grupoDeLaDB.YaSorteo = true
