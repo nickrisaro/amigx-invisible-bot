@@ -92,6 +92,55 @@ func (suite *LaMagaTestSuite) TestLaMagaNosDaLosParticipantesDeUnGrupo() {
 	suite.Equal("Nick", participantes[0])
 }
 
+func (suite *LaMagaTestSuite) TestLaMagaNoListaParticipanteSiNoHayUnGrupo() {
+	IDNuevoGrupo := int64(rand.Int())
+
+	participantes, err := suite.maga.QuienesParticipan(IDNuevoGrupo)
+
+	suite.Error(err, "Debería fallar al buscar participantes de un grupo inexistente")
+	suite.Nil(participantes, "No debería haber participantes si no hay grupo")
+}
+
+func (suite *LaMagaTestSuite) TestLaMagaNoSorteaSiNoHayUnGrupo() {
+	IDNuevoGrupo := int64(rand.Int())
+
+	participantes, err := suite.maga.Sortear(IDNuevoGrupo)
+
+	suite.Error(err, "Debería fallar al sortear en un grupo inexistente")
+	suite.Nil(participantes, "No debería haber participantes si no hay grupo")
+}
+
+func (suite *LaMagaTestSuite) TestLaMagaNoSorteaSiYaSorteó() {
+	IDNuevoGrupo := int64(rand.Int())
+	suite.maga.NuevoGrupo(IDNuevoGrupo, "Mi grupo")
+	IDNuevoParticipante := rand.Int()
+	suite.maga.NuevoParticipante(IDNuevoGrupo, IDNuevoParticipante, "Nick")
+	grupoDeLaDB := modelo.Grupo{Identificador: IDNuevoGrupo}
+	suite.db.Where(grupoDeLaDB).First(&grupoDeLaDB)
+	grupoDeLaDB.YaSorteo = true
+	suite.db.Save(grupoDeLaDB)
+
+	participantes, err := suite.maga.Sortear(IDNuevoGrupo)
+
+	suite.NoError(err, "No debería fallar al sortear en un grupo que ya sorteó")
+	suite.Nil(participantes[0].Amigo, "No debería haber asignado un amigo si ya había sorteado")
+}
+
+func (suite *LaMagaTestSuite) TestLaMagaSorteaAmigxs() {
+	IDNuevoGrupo := int64(rand.Int())
+	suite.maga.NuevoGrupo(IDNuevoGrupo, "Mi grupo")
+	IDUnParticipante := rand.Int()
+	suite.maga.NuevoParticipante(IDNuevoGrupo, IDUnParticipante, "Nick")
+	IDOtroParticipante := rand.Int()
+	suite.maga.NuevoParticipante(IDNuevoGrupo, IDOtroParticipante, "Nay")
+
+	participantes, err := suite.maga.Sortear(IDNuevoGrupo)
+
+	suite.NoError(err, "No debería fallar al sortear")
+	suite.Equal(participantes[0].Amigo.Nombre, "Nay", "Nay debería ser amiga de Nick")
+	suite.Equal(participantes[1].Amigo.Nombre, "Nick", "Nick debería ser amigo de Nay")
+}
+
 func TestLaMagaTestSuite(t *testing.T) {
 	suite.Run(t, new(LaMagaTestSuite))
 }

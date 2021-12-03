@@ -80,7 +80,9 @@ func (lm *LaMaga) Sortear(identificadorDeGrupo int64) ([]*modelo.Participante, e
 
 	for i := 0; i < cantidadDeParticipantes; {
 		idRandom := rand.Intn(cantidadDeParticipantes)
-		if idRandom != i && !idsSorteados[idRandom] {
+		_, idYaSorteado := idsSorteados[idRandom]
+
+		if idRandom != i && !idYaSorteado {
 			sorteados[i] = idRandom
 			idsSorteados[idRandom] = true
 			i++
