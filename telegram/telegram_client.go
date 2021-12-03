@@ -23,7 +23,7 @@ func Configurar(urlPublica string, urlPrivada string, token string, maga *lamaga
 		b.Send(m.Chat, "Pong!")
 	})
 
-	b.Handle("/hola", func(m *tb.Message) {
+	b.Handle("/start", func(m *tb.Message) {
 		b.Send(m.Chat, "Hola soy La Maga, si querés jugar al amigo, amiga, amigue, amigx invisble yo te puedo ayudar")
 		b.Send(m.Chat, "Si ya estás jugando en un grupo te voy a avisar por acá a quién le tenés que regalar algo")
 		b.Send(m.Chat, "Si todavía no estás jugando, agregame en alguno de tus grupos y empezá el juego!")
@@ -31,13 +31,13 @@ func Configurar(urlPublica string, urlPrivada string, token string, maga *lamaga
 
 	b.Handle("/help", func(m *tb.Message) {
 		ayuda := "Hola soy La Maga, si querés jugar al amigo, amiga, amigue, amigx invisble yo te puedo ayudar\n"
-		ayuda += "Para empezar mandá el comando /start así preparo todo\n"
+		ayuda += "Para empezar mandá el comando /comenzar así preparo todo\n"
 		ayuda += "Cada persona que quiera participar tiene que mandar /sumame\n"
 		ayuda += "Cuando todas las personas se hayan sumado mandá /sortear\n"
 		b.Send(m.Chat, ayuda)
 	})
 
-	b.Handle("/start", func(m *tb.Message) {
+	b.Handle("/comenzar", func(m *tb.Message) {
 		nombreDelGrupo := m.Chat.Title
 		if len(nombreDelGrupo) == 0 {
 			nombreDelGrupo = m.Chat.FirstName + " " + m.Chat.LastName
@@ -59,11 +59,11 @@ func Configurar(urlPublica string, urlPrivada string, token string, maga *lamaga
 		err := maga.NuevoParticipante(m.Chat.ID, m.Sender.ID, m.Sender.FirstName+" "+m.Sender.LastName)
 		if err != nil {
 			fmt.Println("Error al agregar persona al grupo", err)
-			b.Send(m.Chat, "Ups, no pude agregar a la persona al grupo ¿Ya creaste el grupo con /start ?")
+			b.Send(m.Chat, "Ups, no pude agregar a la persona al grupo ¿Ya creaste el grupo con /comenzar ?")
 		} else {
 			_, err = b.Send(m.Sender, "Hola, te anoté para jugar al amigx invisible en el grupo "+nombreDelGrupo+". Cuando hagan el sorteo te voy a avisar a quién le tenés que regalar algo.")
 			if err != nil {
-				b.Send(m.Chat, "@"+m.Sender.Username+" no te puedo mandar mensajes, me tenés que hablar vos primero, andá a @amigxinvisiblebot y mandame el comando /hola")
+				b.Send(m.Chat, "@"+m.Sender.Username+" no te puedo mandar mensajes, me tenés que hablar vos primero, andá a @amigxinvisiblebot y tocá Start")
 			}
 			b.Send(m.Chat, "Listo, ya agregué a @"+m.Sender.Username+" al grupo.\nSi ya se sumaron todas las personas mandá /sortear\nSi querés ver quienes se sumaron mandá /listar")
 		}
@@ -73,7 +73,7 @@ func Configurar(urlPublica string, urlPrivada string, token string, maga *lamaga
 		participantes, err := maga.QuienesParticipan(m.Chat.ID)
 		if err != nil {
 			fmt.Println("Error al listar participantes", err)
-			b.Send(m.Chat, "Ups, no pude encontrar a las personas que participan ¿Ya creaste el grupo con /start ?")
+			b.Send(m.Chat, "Ups, no pude encontrar a las personas que participan ¿Ya creaste el grupo con /comenzar ?")
 		} else {
 			if len(participantes) == 0 {
 				b.Send(m.Chat, "Todavía no se anotó nadie, se pueden sumar al juego con /sumame")
@@ -99,7 +99,7 @@ func Configurar(urlPublica string, urlPrivada string, token string, maga *lamaga
 			if err.Error() == "faltanParticipantes" {
 				b.Send(m.Chat, "Necesito al menos dos personas para poder sortear")
 			} else {
-				b.Send(m.Chat, "Ups, no pude sortear ¿Ya creaste el grupo con /start ?")
+				b.Send(m.Chat, "Ups, no pude sortear ¿Ya creaste el grupo con /comenzar ?")
 			}
 		} else {
 			notifiquéA := 0
@@ -112,7 +112,7 @@ func Configurar(urlPublica string, urlPrivada string, token string, maga *lamaga
 					notifiquéA++
 				} else {
 					fmt.Println("Error al notificar", err)
-					b.Send(m.Chat, participante.Nombre+" no te pude mandar un mensaje, andá a @amigxinvisiblebot y mandame el comando /hola")
+					b.Send(m.Chat, participante.Nombre+" no te pude mandar un mensaje, andá a @amigxinvisiblebot y tocá Start")
 				}
 			}
 			if notifiquéA < len(sorteados) {
