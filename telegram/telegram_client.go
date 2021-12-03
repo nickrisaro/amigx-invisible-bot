@@ -1,7 +1,6 @@
 package telegram
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/nickrisaro/invisible-bot/lamaga"
@@ -62,11 +61,15 @@ func Configurar(urlPublica string, urlPrivada string, token string, maga *lamaga
 			fmt.Println("Error al listar participantes", err)
 			b.Send(m.Chat, "Ups, no pude encontrar a las personas que participan ¿Ya creaste el grupo con /start ?")
 		} else {
-			listaDeParticipantes := "Ya se anotaron para jugar:\n"
-			for _, participante := range participantes {
-				listaDeParticipantes += " * " + participante + "\n"
+			if len(participantes) == 0 {
+				b.Send(m.Chat, "Todavía no se anotó nadie, se pueden sumar al juego con /sumame")
+			} else {
+				listaDeParticipantes := "Ya se anotaron para jugar:\n"
+				for _, participante := range participantes {
+					listaDeParticipantes += " * " + participante + "\n"
+				}
+				b.Send(m.Chat, listaDeParticipantes)
 			}
-			b.Send(m.Chat, listaDeParticipantes)
 		}
 	})
 
@@ -79,7 +82,7 @@ func Configurar(urlPublica string, urlPrivada string, token string, maga *lamaga
 
 		if err != nil {
 			fmt.Println("Error al sortear", err)
-			if errors.Is(err, errors.New("faltanParticipantes")) {
+			if err.Error() == "faltanParticipantes" {
 				b.Send(m.Chat, "Necesito al menos dos personas para poder sortear")
 			} else {
 				b.Send(m.Chat, "Ups, no pude sortear probá más tarde")
