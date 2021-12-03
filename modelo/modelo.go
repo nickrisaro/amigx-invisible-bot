@@ -20,7 +20,7 @@ type Participante struct {
 }
 
 func NewGrupo(identificador int64, nombre string) *Grupo {
-	return &Grupo{Identificador: identificador, Nombre: nombre, Participantes: make([]*Participante, 0), YaSorteo: false}
+	return &Grupo{Identificador: identificador, Nombre: nombre}
 }
 
 func NewParticipante(identificador int, nombre string) *Participante {
