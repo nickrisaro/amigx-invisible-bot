@@ -1,9 +1,7 @@
 package modelo
 
-import "gorm.io/gorm"
-
 type Grupo struct {
-	gorm.Model
+	ID            uint
 	Identificador int64 `gorm:"unique"`
 	Nombre        string
 	Participantes []*Participante
@@ -11,7 +9,7 @@ type Grupo struct {
 }
 
 type Participante struct {
-	gorm.Model
+	ID            uint
 	GrupoID       uint
 	Identificador int
 	Nombre        string

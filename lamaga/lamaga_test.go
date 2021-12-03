@@ -201,6 +201,49 @@ func (suite *LaMagaTestSuite) TestLaMagaNoTeDaLosParticipantesConSusAmigxsSiNoHa
 	suite.Nil(participantes, "No debería haber participantes si no hay grupo")
 }
 
+func (suite *LaMagaTestSuite) TestLaMagaTeBorraUnGrupo() {
+	IDNuevoGrupo := int64(rand.Int())
+	suite.maga.NuevoGrupo(IDNuevoGrupo, "Mi grupo")
+
+	err := suite.maga.Borrar(IDNuevoGrupo)
+
+	suite.NoError(err, "No debería fallar al borrar un grupo")
+	grupoDeLaDB := modelo.Grupo{Identificador: IDNuevoGrupo}
+	resultado := suite.db.Where(grupoDeLaDB).First(&grupoDeLaDB)
+	suite.Error(resultado.Error, "No debería haber encontrado el grupo")
+}
+
+func (suite *LaMagaTestSuite) TestLaMagaTeBorraUnGrupoYSusParticipantes() {
+	IDNuevoGrupo := int64(rand.Int())
+	suite.maga.NuevoGrupo(IDNuevoGrupo, "Mi grupo")
+	grupoDeLaDB := modelo.Grupo{Identificador: IDNuevoGrupo}
+	suite.db.Where(grupoDeLaDB).First(&grupoDeLaDB)
+	idGrupoDB := grupoDeLaDB.ID
+	IDUnParticipante := rand.Int()
+	suite.maga.NuevoParticipante(IDNuevoGrupo, IDUnParticipante, "Nick")
+	IDOtroParticipante := rand.Int()
+	suite.maga.NuevoParticipante(IDNuevoGrupo, IDOtroParticipante, "Nay")
+
+	err := suite.maga.Borrar(IDNuevoGrupo)
+
+	suite.NoError(err, "No debería fallar al borrar un grupo")
+	grupoDeLaDB = modelo.Grupo{Identificador: IDNuevoGrupo}
+	resultado := suite.db.Where(grupoDeLaDB).First(&grupoDeLaDB)
+	suite.Error(resultado.Error, "No debería haber encontrado el grupo")
+	participantesDeLaDB := make([]*modelo.Participante, 0)
+	resultado = suite.db.Where(&modelo.Participante{GrupoID: idGrupoDB}).Find(&participantesDeLaDB)
+	suite.Equal(resultado.RowsAffected, int64(0), "No debería haber encontrado los participantes")
+	suite.Empty(participantesDeLaDB, "No debería haber encontrado los participantes")
+}
+
+func (suite *LaMagaTestSuite) TestLaMagaNoBorraUnGrupoSiNoExiste() {
+	IDNuevoGrupo := int64(rand.Int())
+
+	err := suite.maga.Borrar(IDNuevoGrupo)
+
+	suite.Error(err, "Debería fallar al borrar un grupo si no está creado")
+}
+
 func TestLaMagaTestSuite(t *testing.T) {
 	suite.Run(t, new(LaMagaTestSuite))
 }

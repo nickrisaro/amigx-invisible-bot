@@ -117,7 +117,7 @@ func Configurar(urlPublica string, urlPrivada string, token string, maga *lamaga
 		}
 
 		if err != nil {
-			fmt.Println("Error al sortear", err)
+			fmt.Println("Error al notificar", err)
 			if err.Error() == "noSorteado" {
 				b.Send(m.Chat, "No hice el sorteo en este grupo, si querés sortear mandá /sortear")
 			} else {
@@ -125,6 +125,17 @@ func Configurar(urlPublica string, urlPrivada string, token string, maga *lamaga
 			}
 		} else {
 			mandarMensajes(b, m.Chat, sorteados, nombreDelGrupo)
+		}
+	})
+
+	b.Handle("/terminar", func(m *tb.Message) {
+		err := maga.Borrar(m.Chat.ID)
+
+		if err != nil {
+			fmt.Println("Error al borrar", err)
+			b.Send(m.Chat, "Ups, no pude borrar el grupo, probá más tarde")
+		} else {
+			b.Send(m.Chat, "Listo, ya borré todo, si querés volver a jugar mandá /comenzar")
 		}
 	})
 

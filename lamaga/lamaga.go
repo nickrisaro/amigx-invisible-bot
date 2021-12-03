@@ -130,3 +130,15 @@ func (lm *LaMaga) ParticipantesConAmigxs(identificadorDeGrupo int64) ([]*modelo.
 
 	return grupoDeLaDB.Participantes, nil
 }
+
+func (lm *LaMaga) Borrar(identificadorDeGrupo int64) error {
+	grupoDeLaDB := modelo.Grupo{Identificador: identificadorDeGrupo}
+	resultado := lm.miBaseDeDatos.Where(&grupoDeLaDB).First(&grupoDeLaDB)
+	if resultado.Error != nil {
+		return resultado.Error
+	}
+
+	resultado = lm.miBaseDeDatos.Select("Participantes").Delete(grupoDeLaDB)
+
+	return resultado.Error
+}
