@@ -96,7 +96,7 @@ func (lm *LaMaga) Sortear(identificadorDeGrupo int64) ([]*modelo.Participante, e
 	}
 
 	grupoDeLaDB.YaSorteo = true
-	resultado = lm.miBaseDeDatos.Save(grupoDeLaDB)
+	resultado = lm.miBaseDeDatos.Omit("Participantes").Save(grupoDeLaDB)
 	if resultado.Error != nil {
 		return nil, resultado.Error
 	}
