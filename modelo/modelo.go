@@ -15,7 +15,7 @@ type Participante struct {
 	GrupoID       uint
 	Identificador int
 	Nombre        string
-	AmigxID       uint
+	AmigxID       *uint
 	Amigx         *Participante `gorm:"<-:update"`
 }
 

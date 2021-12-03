@@ -156,8 +156,8 @@ func (suite *LaMagaTestSuite) TestLaMagaSorteaAmigxs() {
 	resultado := suite.db.Preload("Participantes").Where(grupoDeLaDB).First(&grupoDeLaDB)
 	suite.NoError(resultado.Error, "Debería haber encontrado el grupo")
 	suite.True(grupoDeLaDB.YaSorteo, "Debería estar sorteado")
-	suite.Equal(grupoDeLaDB.Participantes[0].AmigxID, grupoDeLaDB.Participantes[1].ID, "Nay debería ser amiga de Nick")
-	suite.Equal(grupoDeLaDB.Participantes[1].AmigxID, grupoDeLaDB.Participantes[0].ID, "Nick debería ser amigo de Nay")
+	suite.Equal(*grupoDeLaDB.Participantes[0].AmigxID, grupoDeLaDB.Participantes[1].ID, "Nay debería ser amiga de Nick")
+	suite.Equal(*grupoDeLaDB.Participantes[1].AmigxID, grupoDeLaDB.Participantes[0].ID, "Nick debería ser amigo de Nay")
 }
 
 func TestLaMagaTestSuite(t *testing.T) {
