@@ -123,7 +123,7 @@ func (suite *LaMagaTestSuite) TestLaMagaNoSorteaSiYaSorteó() {
 	participantes, err := suite.maga.Sortear(IDNuevoGrupo)
 
 	suite.NoError(err, "No debería fallar al sortear en un grupo que ya sorteó")
-	suite.Nil(participantes[0].Amigo, "No debería haber asignado un amigo si ya había sorteado")
+	suite.Nil(participantes[0].Amigx, "No debería haber asignado un amigx si ya había sorteado")
 }
 
 func (suite *LaMagaTestSuite) TestLaMagaNoSorteaSiHayUnSoloParticipante() {
@@ -149,15 +149,15 @@ func (suite *LaMagaTestSuite) TestLaMagaSorteaAmigxs() {
 	participantes, err := suite.maga.Sortear(IDNuevoGrupo)
 
 	suite.NoError(err, "No debería fallar al sortear")
-	suite.Equal(participantes[0].Amigo.Nombre, "Nay", "Nay debería ser amiga de Nick")
-	suite.Equal(participantes[1].Amigo.Nombre, "Nick", "Nick debería ser amigo de Nay")
+	suite.Equal(participantes[0].Amigx.Nombre, "Nay", "Nay debería ser amiga de Nick")
+	suite.Equal(participantes[1].Amigx.Nombre, "Nick", "Nick debería ser amigo de Nay")
 
 	grupoDeLaDB := modelo.Grupo{Identificador: IDNuevoGrupo}
 	resultado := suite.db.Preload("Participantes").Where(grupoDeLaDB).First(&grupoDeLaDB)
 	suite.NoError(resultado.Error, "Debería haber encontrado el grupo")
 	suite.True(grupoDeLaDB.YaSorteo, "Debería estar sorteado")
-	suite.Equal(grupoDeLaDB.Participantes[0].AmigoID, grupoDeLaDB.Participantes[1].ID, "Nay debería ser amiga de Nick")
-	suite.Equal(grupoDeLaDB.Participantes[1].AmigoID, grupoDeLaDB.Participantes[0].ID, "Nick debería ser amigo de Nay")
+	suite.Equal(grupoDeLaDB.Participantes[0].AmigxID, grupoDeLaDB.Participantes[1].ID, "Nay debería ser amiga de Nick")
+	suite.Equal(grupoDeLaDB.Participantes[1].AmigxID, grupoDeLaDB.Participantes[0].ID, "Nick debería ser amigo de Nay")
 }
 
 func TestLaMagaTestSuite(t *testing.T) {

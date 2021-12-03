@@ -91,7 +91,7 @@ func (lm *LaMaga) Sortear(identificadorDeGrupo int64) ([]*modelo.Participante, e
 	for i, participante := range grupoDeLaDB.Participantes {
 		idAmigx := sorteados[i]
 		amigx := grupoDeLaDB.Participantes[idAmigx]
-		participante.Amigo = amigx
+		participante.Amigx = amigx
 
 		resultado = lm.miBaseDeDatos.Save(participante)
 		if resultado.Error != nil {

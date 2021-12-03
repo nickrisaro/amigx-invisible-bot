@@ -23,7 +23,7 @@ func TestSePuedeCrearUnParticipante(t *testing.T) {
 	assert.NotNil(t, p, "El particpante no debería ser nil")
 	assert.Equal(t, 123, p.Identificador, "No tiene el identificador correcto")
 	assert.Equal(t, "Nick Risaro", p.Nombre, "No tiene el nombre correcto")
-	assert.Nil(t, p.Amigo, "No debería tener un amigo aún")
+	assert.Nil(t, p.Amigx, "No debería tener un amigx aún")
 }
 
 func TestSePuedeAgregarUnParticipanteAUnGrupo(t *testing.T) {

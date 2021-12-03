@@ -89,7 +89,7 @@ func Configurar(urlPublica string, urlPrivada string, token string, maga *lamaga
 			for _, participante := range sorteados {
 				mensaje := "Hola, " + participante.Nombre +
 					" soy La Maga y te escribo porque estás jugando al amigx invisible en el grupo " + nombreDelGrupo +
-					". La persona a la que le tenés que hacer un regalo es: " + participante.Amigo.Nombre + "!! Pensá en algo lindo para regalarle!"
+					". La persona a la que le tenés que hacer un regalo es: " + participante.Amigx.Nombre + "!! Pensá en algo lindo para regalarle!"
 				_, err = b.Send(&telebot.User{ID: participante.Identificador}, mensaje)
 				if err == nil {
 					notifiquéA++
