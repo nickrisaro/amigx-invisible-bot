@@ -50,8 +50,8 @@ func (lm *LaMaga) QuienesParticipan(identificadorDeGrupo int64) ([]string, error
 
 	nombresDeParticipantes := make([]string, len(grupoDeLaDB.Participantes))
 
-	for _, participante := range grupoDeLaDB.Participantes {
-		nombresDeParticipantes = append(nombresDeParticipantes, participante.Nombre)
+	for i, participante := range grupoDeLaDB.Participantes {
+		nombresDeParticipantes[i] = participante.Nombre
 	}
 
 	return nombresDeParticipantes, nil
