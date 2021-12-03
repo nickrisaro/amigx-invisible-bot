@@ -23,6 +23,12 @@ func Configurar(urlPublica string, urlPrivada string, token string, maga *lamaga
 		b.Send(m.Chat, "Pong!")
 	})
 
+	b.Handle("/hola", func(m *tb.Message) {
+		b.Send(m.Chat, "Hola soy La Maga, si querés jugar al amigo, amiga, amigue, amigx invisble yo te puedo ayudar")
+		b.Send(m.Chat, "Si ya estás jugando en un grupo te voy a avisar por acá a quién le tenés que regalar algo")
+		b.Send(m.Chat, "Si todavía no estás jugando, agregame en alguno de tus grupos y empezá el juego!")
+	})
+
 	b.Handle("/help", func(m *tb.Message) {
 		ayuda := "Hola soy La Maga, si querés jugar al amigo, amiga, amigue, amigx invisble yo te puedo ayudar\n"
 		ayuda += "Para empezar mandá el comando /start así preparo todo\n"
@@ -46,11 +52,19 @@ func Configurar(urlPublica string, urlPrivada string, token string, maga *lamaga
 	})
 
 	b.Handle("/sumame", func(m *tb.Message) {
+		nombreDelGrupo := m.Chat.Title
+		if len(nombreDelGrupo) == 0 {
+			nombreDelGrupo = m.Chat.FirstName + " " + m.Chat.LastName
+		}
 		err := maga.NuevoParticipante(m.Chat.ID, m.Sender.ID, m.Sender.FirstName+" "+m.Sender.LastName)
 		if err != nil {
 			fmt.Println("Error al agregar persona al grupo", err)
 			b.Send(m.Chat, "Ups, no pude agregar a la persona a tu grupo probá más tarde")
 		} else {
+			_, err = b.Send(m.Sender, "Hola, te anoté para jugar al amigx invisible en el grupo "+nombreDelGrupo+". Cuando hagan el sorteo te voy a avisar a quién le tenés que regalar algo.")
+			if err != nil {
+				b.Send(m.Chat, "@"+m.Sender.Username+" no te puedo mandar mensajes, andá a @amigxinvisiblebot y mandame el comando /hola")
+			}
 			b.Send(m.Chat, "Listo, ya agregué a @"+m.Sender.Username+" al grupo.\nSi ya se sumaron todas las personas mandá /sortear\nSi querés ver quienes se sumaron mandá /listar")
 		}
 	})
