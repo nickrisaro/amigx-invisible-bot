@@ -4,7 +4,8 @@ import (
 	"fmt"
 
 	"github.com/nickrisaro/invisible-bot/lamaga"
-	"gopkg.in/tucnak/telebot.v2"
+	"github.com/nickrisaro/invisible-bot/modelo"
+
 	tb "gopkg.in/tucnak/telebot.v2"
 )
 
@@ -104,24 +105,7 @@ func Configurar(urlPublica string, urlPrivada string, token string, maga *lamaga
 				b.Send(m.Chat, "Ups, no pude sortear ¿Ya creaste el grupo con /comenzar ?")
 			}
 		} else {
-			notifiquéA := 0
-			for _, participante := range sorteados {
-				mensaje := "Hola, " + participante.Nombre +
-					" soy La Maga y te escribo porque estás jugando al amigx invisible en el grupo " + nombreDelGrupo +
-					". La persona a la que le tenés que hacer un regalo es: " + participante.Amigx.Nombre + "!! Pensá en algo lindo para regalarle!"
-				_, err = b.Send(&telebot.User{ID: participante.Identificador}, mensaje)
-				if err == nil {
-					notifiquéA++
-				} else {
-					fmt.Println("Error al notificar", err)
-					b.Send(m.Chat, participante.Nombre+" no te pude mandar un mensaje, andá a @amigxinvisiblebot y tocá Start")
-				}
-			}
-			if notifiquéA < len(sorteados) {
-				b.Send(m.Chat, "Ups, no le pude mandar el mensaje a algunas personas, probá de sortear de nuevo en un rato")
-			} else {
-				b.Send(m.Chat, "Listo, ya hice el sorteo, cada participante recibió un mensaje privado con el nombre de la persona a la que le tiene que regalar algo")
-			}
+			mandarMensajes(b, m.Chat, sorteados, nombreDelGrupo)
 		}
 	})
 
@@ -140,26 +124,31 @@ func Configurar(urlPublica string, urlPrivada string, token string, maga *lamaga
 				b.Send(m.Chat, "Ups, no pude mandar los mensajes ¿Ya creaste el grupo con /comenzar y sorteaste con /sortear ?")
 			}
 		} else {
-			notifiquéA := 0
-			for _, participante := range sorteados {
-				mensaje := "Hola, " + participante.Nombre +
-					" soy La Maga y te escribo porque estás jugando al amigx invisible en el grupo " + nombreDelGrupo +
-					". La persona a la que le tenés que hacer un regalo es: " + participante.Amigx.Nombre + "!! Pensá en algo lindo para regalarle!"
-				_, err = b.Send(&telebot.User{ID: participante.Identificador}, mensaje)
-				if err == nil {
-					notifiquéA++
-				} else {
-					fmt.Println("Error al notificar", err)
-					b.Send(m.Chat, participante.Nombre+" no te pude mandar un mensaje, andá a @amigxinvisiblebot y tocá Start")
-				}
-			}
-			if notifiquéA < len(sorteados) {
-				b.Send(m.Chat, "Ups, no le pude mandar el mensaje a algunas personas, probá de sortear de nuevo en un rato")
-			} else {
-				b.Send(m.Chat, "Listo, cada participante recibió un mensaje privado con el nombre de la persona a la que le tiene que regalar algo")
-			}
+			mandarMensajes(b, m.Chat, sorteados, nombreDelGrupo)
 		}
 	})
 
 	return b, nil
+}
+
+func mandarMensajes(b *tb.Bot, chat *tb.Chat, sorteados []*modelo.Participante, nombreDelGrupo string) {
+	var err error
+	notifiquéA := 0
+	for _, participante := range sorteados {
+		mensaje := "Hola, " + participante.Nombre +
+			" soy La Maga y te escribo porque estás jugando al amigx invisible en el grupo " + nombreDelGrupo +
+			". La persona a la que le tenés que hacer un regalo es: " + participante.Amigx.Nombre + "!! Pensá en algo lindo para regalarle!"
+		_, err = b.Send(&tb.User{ID: participante.Identificador}, mensaje)
+		if err == nil {
+			notifiquéA++
+		} else {
+			fmt.Println("Error al notificar", err)
+			b.Send(chat, participante.Nombre+" no te pude mandar un mensaje, andá a @amigxinvisiblebot y tocá Start")
+		}
+	}
+	if notifiquéA < len(sorteados) {
+		b.Send(chat, "Ups, no le pude mandar el mensaje a algunas personas, probá de nuevo en un rato")
+	} else {
+		b.Send(chat, "Listo, cada participante recibió un mensaje privado con el nombre de la persona a la que le tiene que regalar algo")
+	}
 }
