@@ -1,6 +1,7 @@
 package telegram
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/nickrisaro/invisible-bot/lamaga"
@@ -59,7 +60,7 @@ func Configurar(urlPublica string, urlPrivada string, token string, maga *lamaga
 		participantes, err := maga.QuienesParticipan(m.Chat.ID)
 		if err != nil {
 			fmt.Println("Error al listar participantes", err)
-			b.Send(m.Chat, "Ups, no pude encontrar a las personas que participan ¿Ya creaste el grupo con /start?")
+			b.Send(m.Chat, "Ups, no pude encontrar a las personas que participan ¿Ya creaste el grupo con /start ?")
 		} else {
 			listaDeParticipantes := "Ya se anotaron para jugar:\n"
 			for _, participante := range participantes {
@@ -78,13 +79,17 @@ func Configurar(urlPublica string, urlPrivada string, token string, maga *lamaga
 
 		if err != nil {
 			fmt.Println("Error al sortear", err)
-			b.Send(m.Chat, "Ups, no pude sortear probá más tarde")
+			if errors.Is(err, errors.New("faltanParticipantes")) {
+				b.Send(m.Chat, "Necesito al menos dos personas para poder sortear")
+			} else {
+				b.Send(m.Chat, "Ups, no pude sortear probá más tarde")
+			}
 		} else {
 			notifiquéA := 0
 			for _, participante := range sorteados {
-				mensaje := "Hola, " + participante.Nombre + 
-				" soy La Maga y te escribo porque estás jugando al amigx invisible en el grupo " + nombreDelGrupo + 
-				". La persona a la que le tenés que hacer un regalo es: " + participante.Amigo.Nombre + "!! Pensá en algo lindo para regalarle!"
+				mensaje := "Hola, " + participante.Nombre +
+					" soy La Maga y te escribo porque estás jugando al amigx invisible en el grupo " + nombreDelGrupo +
+					". La persona a la que le tenés que hacer un regalo es: " + participante.Amigo.Nombre + "!! Pensá en algo lindo para regalarle!"
 				_, err = b.Send(&telebot.User{ID: participante.Identificador}, mensaje)
 				if err == nil {
 					notifiquéA++

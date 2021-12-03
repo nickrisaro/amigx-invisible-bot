@@ -126,6 +126,18 @@ func (suite *LaMagaTestSuite) TestLaMagaNoSorteaSiYaSorteó() {
 	suite.Nil(participantes[0].Amigo, "No debería haber asignado un amigo si ya había sorteado")
 }
 
+func (suite *LaMagaTestSuite) TestLaMagaNoSorteaSiHayUnSoloParticipante() {
+	IDNuevoGrupo := int64(rand.Int())
+	suite.maga.NuevoGrupo(IDNuevoGrupo, "Mi grupo")
+	IDNuevoParticipante := rand.Int()
+	suite.maga.NuevoParticipante(IDNuevoGrupo, IDNuevoParticipante, "Nick")
+
+	participantes, err := suite.maga.Sortear(IDNuevoGrupo)
+
+	suite.Error(err, "Debería fallar si hay un solo participante")
+	suite.Nil(participantes, "No debería haber sorteado")
+}
+
 func (suite *LaMagaTestSuite) TestLaMagaSorteaAmigxs() {
 	IDNuevoGrupo := int64(rand.Int())
 	suite.maga.NuevoGrupo(IDNuevoGrupo, "Mi grupo")

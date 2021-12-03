@@ -70,6 +70,10 @@ func (lm *LaMaga) Sortear(identificadorDeGrupo int64) ([]*modelo.Participante, e
 
 	cantidadDeParticipantes := len(grupoDeLaDB.Participantes)
 
+	if cantidadDeParticipantes < 2 {
+		return nil, errors.New("faltanParticipantes")
+	}
+
 	idsSorteados := make(map[int]bool, cantidadDeParticipantes)
 	sorteados := make([]int, cantidadDeParticipantes)
 
