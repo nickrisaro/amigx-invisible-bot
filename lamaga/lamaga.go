@@ -65,7 +65,7 @@ func (lm *LaMaga) Sortear(identificadorDeGrupo int64) ([]*modelo.Participante, e
 	}
 
 	if grupoDeLaDB.YaSorteo {
-		return grupoDeLaDB.Participantes, nil
+		return nil, errors.New("yaSorteado")
 	}
 
 	cantidadDeParticipantes := len(grupoDeLaDB.Participantes)
@@ -103,6 +103,29 @@ func (lm *LaMaga) Sortear(identificadorDeGrupo int64) ([]*modelo.Participante, e
 	resultado = lm.miBaseDeDatos.Omit("Participantes").Save(grupoDeLaDB)
 	if resultado.Error != nil {
 		return nil, resultado.Error
+	}
+
+	return grupoDeLaDB.Participantes, nil
+}
+
+func (lm *LaMaga) ParticipantesConAmigxs(identificadorDeGrupo int64) ([]*modelo.Participante, error) {
+	grupoDeLaDB := modelo.Grupo{Identificador: identificadorDeGrupo}
+	resultado := lm.miBaseDeDatos.Where(&grupoDeLaDB).Preload("Participantes").First(&grupoDeLaDB)
+	if resultado.Error != nil {
+		return nil, resultado.Error
+	}
+
+	if !grupoDeLaDB.YaSorteo {
+		return nil, errors.New("noSorteado")
+	}
+
+	for _, participante := range grupoDeLaDB.Participantes {
+		amigxDeLaDB := modelo.Participante{}
+		resultado := lm.miBaseDeDatos.First(&amigxDeLaDB, *participante.AmigxID)
+		if resultado.Error != nil {
+			return nil, resultado.Error
+		}
+		participante.Amigx = &amigxDeLaDB
 	}
 
 	return grupoDeLaDB.Participantes, nil

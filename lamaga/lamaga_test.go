@@ -122,8 +122,8 @@ func (suite *LaMagaTestSuite) TestLaMagaNoSorteaSiYaSorteó() {
 
 	participantes, err := suite.maga.Sortear(IDNuevoGrupo)
 
-	suite.NoError(err, "No debería fallar al sortear en un grupo que ya sorteó")
-	suite.Nil(participantes[0].Amigx, "No debería haber asignado un amigx si ya había sorteado")
+	suite.Error(err, "Debería fallar al sortear en un grupo que ya sorteó")
+	suite.Nil(participantes, "No debería haber participantes si ya había sorteado")
 }
 
 func (suite *LaMagaTestSuite) TestLaMagaNoSorteaSiHayUnSoloParticipante() {
@@ -158,6 +158,47 @@ func (suite *LaMagaTestSuite) TestLaMagaSorteaAmigxs() {
 	suite.True(grupoDeLaDB.YaSorteo, "Debería estar sorteado")
 	suite.Equal(*grupoDeLaDB.Participantes[0].AmigxID, grupoDeLaDB.Participantes[1].ID, "Nay debería ser amiga de Nick")
 	suite.Equal(*grupoDeLaDB.Participantes[1].AmigxID, grupoDeLaDB.Participantes[0].ID, "Nick debería ser amigo de Nay")
+}
+
+func (suite *LaMagaTestSuite) TestLaMagaTeDaLosParticipantesConSusAmigxs() {
+	IDNuevoGrupo := int64(rand.Int())
+	suite.maga.NuevoGrupo(IDNuevoGrupo, "Mi grupo")
+	IDUnParticipante := rand.Int()
+	suite.maga.NuevoParticipante(IDNuevoGrupo, IDUnParticipante, "Nick")
+	IDOtroParticipante := rand.Int()
+	suite.maga.NuevoParticipante(IDNuevoGrupo, IDOtroParticipante, "Nay")
+	suite.maga.Sortear(IDNuevoGrupo)
+
+	participantes, err := suite.maga.ParticipantesConAmigxs(IDNuevoGrupo)
+	suite.NoError(err, "No debería fallar al buscar participantes y amigxs")
+	suite.NotNil(participantes, "Debería haber participantes")
+	suite.NotNil(participantes[0].Amigx, "Nick debería tener amigx")
+	suite.NotNil(participantes[1].Amigx, "Nay debería tener amigx")
+	suite.Equal(participantes[0].Amigx.Nombre, "Nay", "Nay debería ser amiga de Nick")
+	suite.Equal(participantes[1].Amigx.Nombre, "Nick", "Nick debería ser amigo de Nay")
+}
+
+func (suite *LaMagaTestSuite) TestLaMagaNoTeDaLosParticipantesConSusAmigxsSiNoSorteaste() {
+	IDNuevoGrupo := int64(rand.Int())
+	suite.maga.NuevoGrupo(IDNuevoGrupo, "Mi grupo")
+	IDUnParticipante := rand.Int()
+	suite.maga.NuevoParticipante(IDNuevoGrupo, IDUnParticipante, "Nick")
+	IDOtroParticipante := rand.Int()
+	suite.maga.NuevoParticipante(IDNuevoGrupo, IDOtroParticipante, "Nay")
+
+	participantes, err := suite.maga.ParticipantesConAmigxs(IDNuevoGrupo)
+
+	suite.Error(err, "Debería fallar al buscar participantes y amigxs si no hizo el sorteo")
+	suite.Nil(participantes, "No debería haber participantes si no hizo el sorteo")
+}
+
+func (suite *LaMagaTestSuite) TestLaMagaNoTeDaLosParticipantesConSusAmigxsSiNoHayGrupo() {
+	IDNuevoGrupo := int64(rand.Int())
+
+	participantes, err := suite.maga.ParticipantesConAmigxs(IDNuevoGrupo)
+
+	suite.Error(err, "Debería fallar al buscar participantes y amigxs si no hay grupo")
+	suite.Nil(participantes, "No debería haber participantes si no hay grupo")
 }
 
 func TestLaMagaTestSuite(t *testing.T) {

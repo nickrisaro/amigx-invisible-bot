@@ -98,6 +98,8 @@ func Configurar(urlPublica string, urlPrivada string, token string, maga *lamaga
 			fmt.Println("Error al sortear", err)
 			if err.Error() == "faltanParticipantes" {
 				b.Send(m.Chat, "Necesito al menos dos personas para poder sortear")
+			} else if err.Error() == "yaSorteado" {
+				b.Send(m.Chat, "Ya hice el sorteo en este grupo, si querés que vuelva a notificar mandá /notificar")
 			} else {
 				b.Send(m.Chat, "Ups, no pude sortear ¿Ya creaste el grupo con /comenzar ?")
 			}
@@ -119,6 +121,42 @@ func Configurar(urlPublica string, urlPrivada string, token string, maga *lamaga
 				b.Send(m.Chat, "Ups, no le pude mandar el mensaje a algunas personas, probá de sortear de nuevo en un rato")
 			} else {
 				b.Send(m.Chat, "Listo, ya hice el sorteo, cada participante recibió un mensaje privado con el nombre de la persona a la que le tiene que regalar algo")
+			}
+		}
+	})
+
+	b.Handle("/notificar", func(m *tb.Message) {
+		sorteados, err := maga.ParticipantesConAmigxs(m.Chat.ID)
+		nombreDelGrupo := m.Chat.Title
+		if len(nombreDelGrupo) == 0 {
+			nombreDelGrupo = m.Chat.FirstName + " " + m.Chat.LastName
+		}
+
+		if err != nil {
+			fmt.Println("Error al sortear", err)
+			if err.Error() == "noSorteado" {
+				b.Send(m.Chat, "No hice el sorteo en este grupo, si querés sortear mandá /sortear")
+			} else {
+				b.Send(m.Chat, "Ups, no pude mandar los mensajes ¿Ya creaste el grupo con /comenzar y sorteaste con /sortear ?")
+			}
+		} else {
+			notifiquéA := 0
+			for _, participante := range sorteados {
+				mensaje := "Hola, " + participante.Nombre +
+					" soy La Maga y te escribo porque estás jugando al amigx invisible en el grupo " + nombreDelGrupo +
+					". La persona a la que le tenés que hacer un regalo es: " + participante.Amigx.Nombre + "!! Pensá en algo lindo para regalarle!"
+				_, err = b.Send(&telebot.User{ID: participante.Identificador}, mensaje)
+				if err == nil {
+					notifiquéA++
+				} else {
+					fmt.Println("Error al notificar", err)
+					b.Send(m.Chat, participante.Nombre+" no te pude mandar un mensaje, andá a @amigxinvisiblebot y tocá Start")
+				}
+			}
+			if notifiquéA < len(sorteados) {
+				b.Send(m.Chat, "Ups, no le pude mandar el mensaje a algunas personas, probá de sortear de nuevo en un rato")
+			} else {
+				b.Send(m.Chat, "Listo, cada participante recibió un mensaje privado con el nombre de la persona a la que le tiene que regalar algo")
 			}
 		}
 	})
