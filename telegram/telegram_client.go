@@ -39,6 +39,10 @@ func Configurar(urlPublica string, urlPrivada string, token string, maga *lamaga
 	})
 
 	b.Handle("/comenzar", func(m *tb.Message) {
+		if !m.FromGroup() {
+			b.Send(m.Chat, "No podés comenzar en un chat privado, agregame a un grupo con tus amigxs y mandá /comenzar ahí")
+			return
+		}
 		nombreDelGrupo := m.Chat.Title
 		if len(nombreDelGrupo) == 0 {
 			nombreDelGrupo = m.Chat.FirstName + " " + m.Chat.LastName
@@ -57,16 +61,21 @@ func Configurar(urlPublica string, urlPrivada string, token string, maga *lamaga
 		if len(nombreDelGrupo) == 0 {
 			nombreDelGrupo = m.Chat.FirstName + " " + m.Chat.LastName
 		}
-		err := maga.NuevoParticipante(m.Chat.ID, m.Sender.ID, m.Sender.FirstName+" "+m.Sender.LastName)
+		nombreCompletoParticipante := m.Sender.FirstName + " " + m.Sender.LastName
+		username := nombreCompletoParticipante
+		if len(m.Sender.Username) > 0 {
+			username = m.Sender.Username
+		}
+		err := maga.NuevoParticipante(m.Chat.ID, m.Sender.ID, nombreCompletoParticipante)
 		if err != nil {
 			fmt.Println("Error al agregar persona al grupo", err)
 			b.Send(m.Chat, "Ups, no pude agregar a la persona al grupo ¿Ya creaste el grupo con /comenzar ?")
 		} else {
 			_, err = b.Send(m.Sender, "Hola, te anoté para jugar al amigx invisible en el grupo "+nombreDelGrupo+". Cuando hagan el sorteo te voy a avisar a quién le tenés que regalar algo.")
 			if err != nil {
-				b.Send(m.Chat, "@"+m.Sender.Username+" no te puedo mandar mensajes, me tenés que hablar vos primero, andá a @amigxinvisiblebot y tocá Start")
+				b.Send(m.Chat, "@"+username+" no te puedo mandar mensajes, me tenés que hablar vos primero, andá a @amigxinvisiblebot y tocá Start")
 			}
-			b.Send(m.Chat, "Listo, ya agregué a @"+m.Sender.Username+" al grupo.\nSi ya se sumaron todas las personas mandá /sortear\nSi querés ver quienes se sumaron mandá /listar")
+			b.Send(m.Chat, "Listo, ya agregué a @"+username+" al grupo.\nSi ya se sumaron todas las personas mandá /sortear\nSi querés ver quienes se sumaron mandá /listar")
 		}
 	})
 
