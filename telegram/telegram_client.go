@@ -28,7 +28,7 @@ func Configurar(urlPublica string, urlPrivada string, token string, maga *lamaga
 		b.Send(m.Chat, "Hola soy La Maga, si querés jugar al amigo, amiga, amigue, amigx invisble yo te puedo ayudar")
 		b.Send(m.Chat, "Si ya estás jugando en un grupo te voy a avisar por acá a quién le tenés que regalar algo")
 		b.Send(m.Chat, "Si todavía no estás jugando, agregame en alguno de tus grupos y empezá el juego!")
-		b.Send(m.Chat, "Si querés ver en que grupos estás jugando mandá /misGrupos y si querés ver a quién le tenés que regalar mandá /misAmigxs")
+		b.Send(m.Chat, "Si querés ver en que grupos estás jugando mandá /misgrupos y si querés ver a quién le tenés que regalar mandá /misamigxs")
 	})
 
 	b.Handle("/help", func(m *tb.Message) {
@@ -36,8 +36,8 @@ func Configurar(urlPublica string, urlPrivada string, token string, maga *lamaga
 		ayuda += "Para empezar mandá el comando /comenzar así preparo todo\n"
 		ayuda += "Cada persona que quiera participar tiene que mandar /sumame\n"
 		ayuda += "Cuando todas las personas se hayan sumado mandá /sortear\n"
-		ayuda += "Si querés ver en que grupos estás jugando mandá /misGrupos (lo podés mandar en un grupo y la respuesta te llega sólo a vos)\n"
-		ayuda += "Si querés ver a quién le tenés que regalar mandá /misAmigxs (lo podés mandar en un grupo y la respuesta te llega sólo a vos)\n"
+		ayuda += "Si querés ver en que grupos estás jugando mandá /misgrupos (lo podés mandar en un grupo y la respuesta te llega sólo a vos)\n"
+		ayuda += "Si querés ver a quién le tenés que regalar mandá /misamigxs (lo podés mandar en un grupo y la respuesta te llega sólo a vos)\n"
 		b.Send(m.Chat, ayuda)
 	})
 
@@ -140,7 +140,7 @@ func Configurar(urlPublica string, urlPrivada string, token string, maga *lamaga
 		}
 	})
 
-	b.Handle("/misGrupos", func(m *tb.Message) {
+	b.Handle("/misgrupos", func(m *tb.Message) {
 		gruposDeParticipante, err := maga.GruposDe(m.Sender.ID)
 		if err != nil {
 			fmt.Println("Error al listar grupos", err)
@@ -158,7 +158,7 @@ func Configurar(urlPublica string, urlPrivada string, token string, maga *lamaga
 		}
 	})
 
-	b.Handle("/misAmigxs", func(m *tb.Message) {
+	b.Handle("/misamigxs", func(m *tb.Message) {
 		gruposyAmigxs, err := maga.AmigxsDe(m.Sender.ID)
 		if err != nil {
 			fmt.Println("Error al listar amigxs", err)
