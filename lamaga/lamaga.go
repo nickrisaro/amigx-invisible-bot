@@ -152,3 +152,20 @@ func (lm *LaMaga) GruposDe(identificadorDeParticipante int) ([]*modelo.Grupo, er
 		Scan(&grupos)
 	return grupos, resultado.Error
 }
+
+func (lm *LaMaga) AmigxsDe(identificadorDeParticipante int) ([]GrupoAmigx, error) {
+	grupos := make([]GrupoAmigx, 0)
+	resultado := lm.miBaseDeDatos.Table("Grupos").
+		Select("Grupos.Nombre Grupo, Amigx.Nombre Amigx").
+		Joins("left join Participantes participante on participante.grupo_id = Grupos.id").
+		Joins("left join Participantes Amigx on participante.amigx_id = Amigx.id").
+		Where("participante.identificador = ?", identificadorDeParticipante).
+		Where("Grupos.Ya_Sorteo = true").
+		Scan(&grupos)
+	return grupos, resultado.Error
+}
+
+type GrupoAmigx struct {
+	Grupo string
+	Amigx string
+}

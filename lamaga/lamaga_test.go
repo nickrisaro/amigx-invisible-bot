@@ -259,11 +259,31 @@ func (suite *LaMagaTestSuite) TestLaMagaTeDiceEnQueGruposTeAnotaste() {
 	grupos, err := suite.maga.GruposDe(IDUnParticipante)
 
 	suite.NoError(err, "No debería fallar al buscar grupos")
-	suite.Len(grupos, 2, "Debería haber dos grupo")
+	suite.Len(grupos, 2, "Debería haber dos grupos")
 	suite.Equal(IDNuevoGrupo, grupos[0].Identificador, "No coincide el Ientificador de Grupo")
 	suite.Equal("Mi grupo", grupos[0].Nombre, "No coincide el nombre del Grupo")
 	suite.Equal(IDOtroGrupo, grupos[1].Identificador, "No coincide el Ientificador de Grupo")
 	suite.Equal("Mi otro grupo", grupos[1].Nombre, "No coincide el nombre del Grupo")
+}
+
+func (suite *LaMagaTestSuite) TestLaMagaTeDiceTodxsTusAmigxs() {
+	IDNuevoGrupo := int64(rand.Int())
+	suite.maga.NuevoGrupo(IDNuevoGrupo, "Mi grupo")
+	IDUnParticipante := rand.Int()
+	suite.maga.NuevoParticipante(IDNuevoGrupo, IDUnParticipante, "Nick")
+	IDOtroParticipante := rand.Int()
+	suite.maga.NuevoParticipante(IDNuevoGrupo, IDOtroParticipante, "Nay")
+	suite.maga.Sortear(IDNuevoGrupo)
+	IDOtroGrupo := int64(rand.Int())
+	suite.maga.NuevoGrupo(IDOtroGrupo, "Mi otro grupo")
+	suite.maga.NuevoParticipante(IDOtroGrupo, IDUnParticipante, "Nick")
+
+	grupoAmigx, err := suite.maga.AmigxsDe(IDUnParticipante)
+
+	suite.NoError(err, "No debería fallar al buscar amigxs")
+	suite.Len(grupoAmigx, 1, "Debería haber un amigx")
+	suite.Equal("Mi grupo", grupoAmigx[0].Grupo, "No coincide el nombre del Grupo")
+	suite.Equal("Nay", grupoAmigx[0].Amigx, "No coincide el nombre del Amigx")
 }
 
 func TestLaMagaTestSuite(t *testing.T) {
