@@ -142,3 +142,13 @@ func (lm *LaMaga) Borrar(identificadorDeGrupo int64) error {
 
 	return resultado.Error
 }
+
+func (lm *LaMaga) GruposDe(identificadorDeParticipante int) ([]*modelo.Grupo, error) {
+	grupos := make([]*modelo.Grupo, 0)
+	resultado := lm.miBaseDeDatos.Table("Grupos").
+		Select("Grupos.*").
+		Joins("left join Participantes on Participantes.grupo_id = Grupos.id").
+		Where("Participantes.identificador = ?", identificadorDeParticipante).
+		Scan(&grupos)
+	return grupos, resultado.Error
+}

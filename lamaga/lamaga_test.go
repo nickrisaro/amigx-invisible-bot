@@ -244,6 +244,28 @@ func (suite *LaMagaTestSuite) TestLaMagaNoBorraUnGrupoSiNoExiste() {
 	suite.Error(err, "Debería fallar al borrar un grupo si no está creado")
 }
 
+func (suite *LaMagaTestSuite) TestLaMagaTeDiceEnQueGruposTeAnotaste() {
+	IDNuevoGrupo := int64(rand.Int())
+	suite.maga.NuevoGrupo(IDNuevoGrupo, "Mi grupo")
+	IDUnParticipante := rand.Int()
+	suite.maga.NuevoParticipante(IDNuevoGrupo, IDUnParticipante, "Nick")
+	IDOtroParticipante := rand.Int()
+	suite.maga.NuevoParticipante(IDNuevoGrupo, IDOtroParticipante, "Nay")
+	suite.maga.Sortear(IDNuevoGrupo)
+	IDOtroGrupo := int64(rand.Int())
+	suite.maga.NuevoGrupo(IDOtroGrupo, "Mi otro grupo")
+	suite.maga.NuevoParticipante(IDOtroGrupo, IDUnParticipante, "Nick")
+
+	grupos, err := suite.maga.GruposDe(IDUnParticipante)
+
+	suite.NoError(err, "No debería fallar al buscar grupos")
+	suite.Len(grupos, 2, "Debería haber dos grupo")
+	suite.Equal(IDNuevoGrupo, grupos[0].Identificador, "No coincide el Ientificador de Grupo")
+	suite.Equal("Mi grupo", grupos[0].Nombre, "No coincide el nombre del Grupo")
+	suite.Equal(IDOtroGrupo, grupos[1].Identificador, "No coincide el Ientificador de Grupo")
+	suite.Equal("Mi otro grupo", grupos[1].Nombre, "No coincide el nombre del Grupo")
+}
+
 func TestLaMagaTestSuite(t *testing.T) {
 	suite.Run(t, new(LaMagaTestSuite))
 }
