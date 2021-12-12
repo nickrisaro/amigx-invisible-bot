@@ -145,22 +145,22 @@ func (lm *LaMaga) Borrar(identificadorDeGrupo int64) error {
 
 func (lm *LaMaga) GruposDe(identificadorDeParticipante int) ([]*modelo.Grupo, error) {
 	grupos := make([]*modelo.Grupo, 0)
-	resultado := lm.miBaseDeDatos.Table("Grupos").
-		Select("Grupos.*").
-		Joins("left join Participantes on Participantes.grupo_id = Grupos.id").
-		Where("Participantes.identificador = ?", identificadorDeParticipante).
+	resultado := lm.miBaseDeDatos.Table("grupos").
+		Select("grupos.*").
+		Joins("left join participantes on participantes.grupo_id = grupos.id").
+		Where("participantes.identificador = ?", identificadorDeParticipante).
 		Scan(&grupos)
 	return grupos, resultado.Error
 }
 
 func (lm *LaMaga) AmigxsDe(identificadorDeParticipante int) ([]GrupoAmigx, error) {
 	grupos := make([]GrupoAmigx, 0)
-	resultado := lm.miBaseDeDatos.Table("Grupos").
-		Select("Grupos.Nombre Grupo, Amigx.Nombre Amigx").
-		Joins("left join Participantes participante on participante.grupo_id = Grupos.id").
-		Joins("left join Participantes Amigx on participante.amigx_id = Amigx.id").
+	resultado := lm.miBaseDeDatos.Table("grupos").
+		Select("grupos.Nombre Grupo, Amigx.Nombre Amigx").
+		Joins("left join participantes participante on participante.grupo_id = grupos.id").
+		Joins("left join participantes Amigx on participante.amigx_id = Amigx.id").
 		Where("participante.identificador = ?", identificadorDeParticipante).
-		Where("Grupos.Ya_Sorteo = true").
+		Where("grupos.Ya_Sorteo = true").
 		Scan(&grupos)
 	return grupos, resultado.Error
 }

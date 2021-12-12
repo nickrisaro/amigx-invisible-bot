@@ -137,6 +137,24 @@ func Configurar(urlPublica string, urlPrivada string, token string, maga *lamaga
 		}
 	})
 
+	b.Handle("/misGrupos", func(m *tb.Message) {
+		gruposDeParticipante, err := maga.GruposDe(m.Sender.ID)
+		if err != nil {
+			fmt.Println("Error al listar grupos", err)
+			b.Send(m.Sender, "Ups, no pude encontrar tus grupos ¿Ya creaste alguno grupo con /comenzar y te sumaste con /sumame ?")
+		} else {
+			if len(gruposDeParticipante) == 0 {
+				b.Send(m.Sender, "Todavía no te anotaste en ningún grupo, te podés sumar mandando /sumame en algún grupo")
+			} else {
+				listaDeGrupos := "Estás jugando en:\n"
+				for _, participante := range gruposDeParticipante {
+					listaDeGrupos += " * " + participante.Nombre + "\n"
+				}
+				b.Send(m.Sender, listaDeGrupos)
+			}
+		}
+	})
+
 	b.Handle("/terminar", func(m *tb.Message) {
 		err := maga.Borrar(m.Chat.ID)
 
