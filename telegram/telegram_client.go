@@ -155,6 +155,24 @@ func Configurar(urlPublica string, urlPrivada string, token string, maga *lamaga
 		}
 	})
 
+	b.Handle("/misAmigxs", func(m *tb.Message) {
+		gruposyAmigxs, err := maga.AmigxsDe(m.Sender.ID)
+		if err != nil {
+			fmt.Println("Error al listar amigxs", err)
+			b.Send(m.Sender, "Ups, no pude encontrar tus amigxs ¿Ya creaste algun grupo con /comenzar te sumaste con /sumame y sorteaste con /sortear ?")
+		} else {
+			if len(gruposyAmigxs) == 0 {
+				b.Send(m.Sender, "Todavía no tenés amigxs en ningún grupo, te podés sumar mandando /sumame en algún grupo y después sortear con /sortear")
+			} else {
+				listaDeGruposYAmigxs := "Estos son tus amigxs:\n"
+				for _, grupoAmigx := range gruposyAmigxs {
+					listaDeGruposYAmigxs += "\\* En el grupo *" + grupoAmigx.Grupo + "* le tenés que regalar a *" + grupoAmigx.Amigx + "*\n"
+				}
+				b.Send(m.Sender, listaDeGruposYAmigxs, tb.ModeMarkdownV2)
+			}
+		}
+	})
+
 	b.Handle("/terminar", func(m *tb.Message) {
 		err := maga.Borrar(m.Chat.ID)
 
