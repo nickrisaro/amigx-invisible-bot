@@ -171,7 +171,10 @@ func Configurar(urlPublica string, urlPrivada string, token string, maga *lamaga
 				for _, grupoAmigx := range gruposyAmigxs {
 					listaDeGruposYAmigxs += "\\* En el grupo *" + grupoAmigx.Grupo + "* le tenés que regalar a *" + grupoAmigx.Amigx + "*\n"
 				}
-				b.Send(m.Sender, listaDeGruposYAmigxs, tb.ModeMarkdownV2)
+				_, err := b.Send(m.Sender, listaDeGruposYAmigxs, tb.ModeMarkdownV2)
+				if err != nil {
+					fmt.Println("Error al mandar lista de amigxs de", m.Sender.ID, err)
+				}
 			}
 		}
 	})
